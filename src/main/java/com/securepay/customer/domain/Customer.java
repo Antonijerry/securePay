@@ -1,12 +1,14 @@
 package com.securepay.customer.domain;
 
+import com.securepay.customer.exception.CustomerAlreadyClosedException;
+
 import java.time.Instant;
 import java.util.Objects;
 
 public final class Customer {
 
     private final CustomerId id;
-    private final String email;
+    private final Email email;
     private final String firstName;
     private final String lastName;
     private final Instant createdAt;
@@ -16,13 +18,13 @@ public final class Customer {
 
     private Customer(
             CustomerId id,
-            String email,
+            Email email,
             String firstName,
             String lastName,
             Instant createdAt
     ) {
         this.id = Objects.requireNonNull(id);
-        this.email = requireText(email, "Email");
+        this.email = Objects.requireNonNull(email, "Email cannot be null");
         this.firstName = requireText(firstName, "First name");
         this.lastName = requireText(lastName, "Last name");
         this.createdAt = Objects.requireNonNull(createdAt);
@@ -40,7 +42,7 @@ public final class Customer {
 
         return new Customer(
                 CustomerId.generate(),
-                email,
+                Email.of(email),
                 firstName,
                 lastName,
                 now
@@ -63,9 +65,7 @@ public final class Customer {
 
     public void activate() {
         if (status == CustomerStatus.CLOSED) {
-            throw new IllegalStateException(
-                    "Closed customer cannot be activated"
-            );
+          throw new CustomerAlreadyClosedException();
         }
 
         status = CustomerStatus.ACTIVE;
@@ -87,7 +87,7 @@ public final class Customer {
         return id;
     }
 
-    public String email() {
+    public Email email() {
         return email;
     }
 
