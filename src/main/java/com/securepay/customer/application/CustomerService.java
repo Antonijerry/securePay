@@ -4,13 +4,18 @@ import com.securepay.customer.domain.Customer;
 import com.securepay.customer.domain.CustomerId;
 import com.securepay.customer.domain.Email;
 import com.securepay.customer.exception.CustomerAlreadyExistsException;
+import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
+@Service
 public final class CustomerService {
 
     private final CustomerRepository customerRepository;
 
+    //constructor injection: here spring sees constructor and says it needs to create customerService
+    //and that the customerService needs customerRepository; and that kit has inMemoryCustomerService which implements the customerRepository
+    //this is dependency injection
     public CustomerService(CustomerRepository customerRepository) {
         this.customerRepository = Objects.requireNonNull(
                 customerRepository,

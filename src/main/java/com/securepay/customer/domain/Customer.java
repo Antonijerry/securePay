@@ -33,6 +33,15 @@ public final class Customer {
         this.updatedAt = createdAt;
     }
 
+    public CustomerId getId(){
+        return id;
+    }
+    public Object getEmail() {
+        return email;
+    }
+
+
+
     public static Customer create(
             String email,
             String firstName,
@@ -137,4 +146,6 @@ public final class Customer {
 
         return value;
     }
+
+
 }
