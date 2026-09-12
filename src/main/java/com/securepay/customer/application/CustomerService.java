@@ -4,6 +4,7 @@ import com.securepay.customer.domain.Customer;
 import com.securepay.customer.domain.CustomerId;
 import com.securepay.customer.domain.Email;
 import com.securepay.customer.exception.CustomerAlreadyExistsException;
+import com.securepay.customer.exception.CustomerNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -42,5 +43,10 @@ public final class CustomerService {
         Customer savedCustomer = customerRepository.save(customer);
 
         return savedCustomer.getId();
+    }
+
+    public Customer getCustomer(CustomerId customerId) {
+        return customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException(customerId));
     }
 }

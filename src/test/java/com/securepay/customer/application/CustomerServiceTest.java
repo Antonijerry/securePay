@@ -3,6 +3,7 @@ package com.securepay.customer.application;
 import com.securepay.customer.domain.Customer;
 import com.securepay.customer.domain.CustomerId;
 import com.securepay.customer.exception.CustomerAlreadyExistsException;
+import com.securepay.customer.exception.CustomerNotFoundException;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -107,6 +108,18 @@ class CustomerServiceTest {
         );
 
         assertEquals(0, repository.customers.size());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenCustomerDoesNotExist() {
+        FakeCustomerRepository repository = new FakeCustomerRepository();
+        CustomerService service = new CustomerService(repository);
+        CustomerId customerId = CustomerId.generate();
+
+        assertThrows(
+                CustomerNotFoundException.class,
+                () -> service.getCustomer(customerId)
+        );
     }
 
 }

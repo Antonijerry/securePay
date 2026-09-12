@@ -23,24 +23,18 @@ public final class Customer {
             String lastName,
             Instant createdAt
     ) {
-        this.id = Objects.requireNonNull(id);
+        this.id = Objects.requireNonNull(id, "Customer ID cannot be null");
         this.email = Objects.requireNonNull(email, "Email cannot be null");
         this.firstName = requireText(firstName, "First name");
         this.lastName = requireText(lastName, "Last name");
-        this.createdAt = Objects.requireNonNull(createdAt);
+        this.createdAt = Objects.requireNonNull(
+                createdAt,
+                "Created date cannot be null"
+        );
 
         this.status = CustomerStatus.ACTIVE;
         this.updatedAt = createdAt;
     }
-
-    public CustomerId getId(){
-        return id;
-    }
-    public Object getEmail() {
-        return email;
-    }
-
-
 
     public static Customer create(
             String email,
@@ -74,7 +68,7 @@ public final class Customer {
 
     public void activate() {
         if (status == CustomerStatus.CLOSED) {
-          throw new CustomerAlreadyClosedException();
+            throw new CustomerAlreadyClosedException();
         }
 
         status = CustomerStatus.ACTIVE;
@@ -91,6 +85,68 @@ public final class Customer {
         status = CustomerStatus.CLOSED;
         touch();
     }
+
+    private void ensureNotClosed() {
+        if (status == CustomerStatus.CLOSED) {
+            throw new IllegalStateException(
+                    "Closed customer cannot change status"
+            );
+        }
+    }
+
+    private void touch() {
+        updatedAt = Instant.now();
+    }
+
+    private static String requireText(
+            String value,
+            String field
+    ) {
+        Objects.requireNonNull(
+                value,
+                field + " cannot be null"
+        );
+
+        if (value.isBlank()) {
+            throw new IllegalArgumentException(
+                    field + " cannot be blank"
+            );
+        }
+
+        return value.trim();
+    }
+
+    // JavaBean-style getters for REST response DTOs
+
+    public CustomerId getId() {
+        return id;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public CustomerStatus getStatus() {
+        return status;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    // Domain-style accessors
 
     public CustomerId id() {
         return id;
@@ -119,33 +175,4 @@ public final class Customer {
     public Instant updatedAt() {
         return updatedAt;
     }
-
-    private void ensureNotClosed() {
-        if (status == CustomerStatus.CLOSED) {
-            throw new IllegalStateException(
-                    "Closed customer cannot change status"
-            );
-        }
-    }
-
-    private void touch() {
-        updatedAt = Instant.now();
-    }
-
-    private static String requireText(
-            String value,
-            String field
-    ) {
-        Objects.requireNonNull(value, field + " cannot be null");
-
-        if (value.isBlank()) {
-            throw new IllegalArgumentException(
-                    field + " cannot be blank"
-            );
-        }
-
-        return value;
-    }
-
-
 }

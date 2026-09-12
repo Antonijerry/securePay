@@ -4,10 +4,9 @@ import com.securepay.customer.application.CreateCustomerCommand;
 import com.securepay.customer.application.CustomerService;
 import com.securepay.customer.domain.CustomerId;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -21,7 +20,7 @@ public class CustomerController {
     }
 
     @PostMapping
-    public CustomerId createCustomer(
+    public CreateCustomerResponse createCustomer(
             @Valid @RequestBody CreateCustomerRequest request) {
 
         CreateCustomerCommand command = new CreateCustomerCommand(
@@ -30,6 +29,13 @@ public class CustomerController {
                 request.lastName()
         );
 
-        return customerService.createCustomer(command);
+        var customerId = customerService.createCustomer(command);
+        return CreateCustomerResponse.from(customerId);
+    }
+
+    @GetMapping("/{id}")
+    public CustomerResponse getCustomer(@PathVariable UUID id) {
+        var customer = customerService.getCustomer(new CustomerId(id));
+        return CustomerResponse.from(customer);
     }
 }
